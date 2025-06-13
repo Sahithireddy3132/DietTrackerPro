@@ -88,10 +88,20 @@ export class MemStorage implements IStorage {
   async upsertUser(userData: UpsertUser): Promise<User> {
     const existingUser = this.users.get(userData.id);
     const user: User = {
-      ...existingUser,
-      ...userData,
-      updatedAt: new Date(),
+      id: userData.id,
+      email: userData.email || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+      age: userData.age || null,
+      weight: userData.weight || null,
+      height: userData.height || null,
+      fitnessGoal: userData.fitnessGoal || null,
+      activityLevel: userData.activityLevel || null,
+      allergies: userData.allergies || null,
+      dietaryRestrictions: userData.dietaryRestrictions || null,
       createdAt: existingUser?.createdAt || new Date(),
+      updatedAt: new Date(),
     };
     this.users.set(userData.id, user);
     return user;
@@ -110,9 +120,16 @@ export class MemStorage implements IStorage {
   async createDietPlan(dietPlanData: Omit<InsertDietPlan, 'id'>): Promise<DietPlan> {
     const id = nanoid();
     const dietPlan: DietPlan = {
-      ...dietPlanData,
       id,
       createdAt: new Date(),
+      userId: dietPlanData.userId,
+      weekNumber: dietPlanData.weekNumber,
+      dailyCalories: dietPlanData.dailyCalories || null,
+      proteinGoal: dietPlanData.proteinGoal || null,
+      carbGoal: dietPlanData.carbGoal || null,
+      fatGoal: dietPlanData.fatGoal || null,
+      meals: dietPlanData.meals || [],
+      isActive: dietPlanData.isActive ?? null,
     };
     this.dietPlans.set(id, dietPlan);
     return dietPlan;
@@ -145,9 +162,14 @@ export class MemStorage implements IStorage {
   async logWorkout(userWorkoutData: Omit<InsertUserWorkout, 'id'>): Promise<UserWorkout> {
     const id = nanoid();
     const userWorkout: UserWorkout = {
-      ...userWorkoutData,
       id,
+      userId: userWorkoutData.userId,
+      workoutId: userWorkoutData.workoutId,
+      duration: userWorkoutData.duration || null,
+      caloriesBurned: userWorkoutData.caloriesBurned || null,
       completedAt: new Date(),
+      mood: userWorkoutData.mood || null,
+      notes: userWorkoutData.notes || null,
     };
     this.userWorkouts.set(id, userWorkout);
     return userWorkout;
@@ -175,9 +197,15 @@ export class MemStorage implements IStorage {
   async logProgress(progressData: Omit<InsertUserProgress, 'id'>): Promise<UserProgress> {
     const id = nanoid();
     const progress: UserProgress = {
-      ...progressData,
       id,
+      userId: progressData.userId,
       date: new Date(),
+      weight: progressData.weight || null,
+      caloriesBurned: progressData.caloriesBurned || null,
+      caloriesConsumed: progressData.caloriesConsumed || null,
+      waterIntake: progressData.waterIntake || null,
+      mood: progressData.mood || null,
+      energyLevel: progressData.energyLevel || null,
     };
     this.userProgress.set(id, progress);
     return progress;
@@ -199,9 +227,14 @@ export class MemStorage implements IStorage {
   async createGoal(goalData: Omit<InsertGoal, 'id'>): Promise<Goal> {
     const id = nanoid();
     const goal: Goal = {
-      ...goalData,
       id,
+      userId: goalData.userId,
+      type: goalData.type,
+      title: goalData.title,
+      description: goalData.description || null,
+      targetValue: goalData.targetValue || null,
       currentValue: 0,
+      targetDate: goalData.targetDate || null,
       isCompleted: false,
       createdAt: new Date(),
     };
@@ -226,8 +259,12 @@ export class MemStorage implements IStorage {
   async createAchievement(achievementData: Omit<InsertAchievement, 'id'>): Promise<Achievement> {
     const id = nanoid();
     const achievement: Achievement = {
-      ...achievementData,
       id,
+      userId: achievementData.userId,
+      badgeId: achievementData.badgeId,
+      title: achievementData.title,
+      description: achievementData.description || null,
+      icon: achievementData.icon || null,
       earnedAt: new Date(),
     };
     this.achievements.set(id, achievement);
@@ -242,8 +279,10 @@ export class MemStorage implements IStorage {
   async saveChatMessage(messageData: Omit<InsertChatMessage, 'id'>): Promise<ChatMessage> {
     const id = nanoid();
     const message: ChatMessage = {
-      ...messageData,
       id,
+      userId: messageData.userId,
+      message: messageData.message,
+      response: messageData.response || null,
       timestamp: new Date(),
     };
     this.chatMessages.set(id, message);
