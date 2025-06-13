@@ -10,7 +10,16 @@ export function HeroSection() {
       const workoutSection = document.getElementById('workouts');
       workoutSection?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.location.href = '/login';
+      // Show login form directly
+      const username = prompt('Enter your name to start your fitness journey:');
+      if (username && username.trim()) {
+        localStorage.setItem('fitness_user', JSON.stringify({
+          id: `user_${Date.now()}`,
+          username: username.trim(),
+          loginTime: new Date().toISOString()
+        }));
+        window.location.reload();
+      }
     }
   };
 
