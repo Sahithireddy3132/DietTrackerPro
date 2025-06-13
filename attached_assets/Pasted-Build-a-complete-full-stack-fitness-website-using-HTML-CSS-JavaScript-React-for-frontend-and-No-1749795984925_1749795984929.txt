@@ -1,0 +1,48 @@
+Build a complete full-stack fitness website using HTML, CSS, JavaScript (React for frontend), and Node.js or Firebase (backend). The website should be visually modern, responsive, and mobile-friendly. Include the following **highly unique and impressive features** that can make this project stand out in interviews:
+
+1. 💡 AI-Powered Personalized Diet Recommender:
+   - User inputs: age, weight, fitness goal (weight loss, muscle gain), allergies.
+   - AI recommends a dynamic weekly meal plan and calorie intake.
+   - Uses OpenAI API for intelligent meal suggestions.
+
+2. 📹 Interactive Workout Tutorials:
+   - Embedded video tutorials (YouTube/Cloud links).
+   - Categorized by beginner/intermediate/advanced.
+   - User progress tracker (checklist style) for each category.
+
+3. 🧠 Smart AI Chatbot:
+   - Built using OpenAI API.
+   - Can answer user questions about diet, fitness, mental health.
+   - Should be integrated with a chatbot UI on the frontend.
+
+4. 📈 Real-Time Progress Tracker:
+   - Charts to track workout sessions, calories burnt, and mood logs.
+   - Use Chart.js or Recharts to display user fitness analytics.
+
+5. 📍 Smart Gym Locator:
+   - Use Google Maps API to suggest nearest gyms based on user’s location.
+
+6. 🎯 Weekly Goals + Reward Badges:
+   - Users can set weekly fitness goals.
+   - Reward badges (e.g., “Cardio King”) for achieving milestones.
+
+7. 🖱️ Unique Animated Cursor Effects:
+   - When hovered, cursor displays calories burnt or motivational quotes.
+   - Add glowing/neon effect to align with the fitness theme.
+
+8. 🌙 Dark Mode + Theme Toggle.
+
+🔒 Login/Register using Firebase Authentication or JWT-based auth.
+
+📦 Backend should handle:
+- User data (authentication, progress, preferences)
+- Diet plans
+- Goal tracking
+- AI interactions (via OpenAI or dummy data if no API key)
+
+💾 Allow data persistence using Firebase Realtime Database or MongoDB.
+
+💡 Use modular folder structure and clean, scalable code. All code should be written clearly with comments.
+
+After completing, export the whole project (frontend + backend) so I can download and push it to GitHub. Do not include any watermark or branding.
+
