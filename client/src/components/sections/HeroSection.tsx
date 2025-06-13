@@ -10,7 +10,7 @@ export function HeroSection() {
       const workoutSection = document.getElementById('workouts');
       workoutSection?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.location.href = '/api/login';
+      window.location.href = '/auth';
     }
   };
 
