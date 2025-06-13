@@ -28,14 +28,16 @@ export const sessions = pgTable(
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
+  username: varchar("username").unique(),
+  password: varchar("password"),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   // Fitness profile
   age: integer("age"),
-  weight: decimal("weight", { precision: 5, scale: 2 }),
-  height: decimal("height", { precision: 5, scale: 2 }),
+  weight: varchar("weight"),
+  height: varchar("height"),
   fitnessGoal: varchar("fitness_goal"), // weight_loss, muscle_gain, maintenance, athletic_performance
   activityLevel: varchar("activity_level"), // sedentary, lightly_active, moderately_active, very_active
   allergies: text("allergies"),

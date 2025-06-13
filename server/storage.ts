@@ -113,9 +113,100 @@ export class MemStorage implements IStorage {
     this.users.set(userData.id, user);
     
     // Add sample data for new users
-    await this.addSampleDataForUser(userData.id);
+    this.addSampleDataForUser(userData.id);
     
     return user;
+  }
+
+  // Add sample data for new users to populate charts
+  private addSampleDataForUser(userId: string) {
+    // Add sample progress data for past 30 days
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      const progressId = nanoid();
+      const progress: UserProgress = {
+        id: progressId,
+        userId,
+        date,
+        weight: (70 + Math.random() * 10).toFixed(1),
+        caloriesBurned: 200 + Math.floor(Math.random() * 400),
+        caloriesConsumed: 1800 + Math.floor(Math.random() * 600),
+        waterIntake: (2 + Math.random() * 2).toFixed(1),
+        mood: ['excellent', 'good', 'average', 'tired'][Math.floor(Math.random() * 4)],
+        energyLevel: 3 + Math.floor(Math.random() * 3),
+      };
+      this.userProgress.set(progressId, progress);
+    }
+
+    // Add sample workout history
+    const workoutIds = Array.from(this.workouts.keys());
+    for (let i = 0; i < 15; i++) {
+      const workoutId = workoutIds[Math.floor(Math.random() * workoutIds.length)];
+      const userWorkoutId = nanoid();
+      const completedDate = new Date(today);
+      completedDate.setDate(completedDate.getDate() - Math.floor(Math.random() * 30));
+      
+      const userWorkout: UserWorkout = {
+        id: userWorkoutId,
+        userId,
+        workoutId,
+        duration: 30 + Math.floor(Math.random() * 60),
+        caloriesBurned: 200 + Math.floor(Math.random() * 400),
+        completedAt: completedDate,
+        mood: ['energized', 'accomplished', 'tired', 'motivated'][Math.floor(Math.random() * 4)],
+        notes: null,
+      };
+      this.userWorkouts.set(userWorkoutId, userWorkout);
+    }
+
+    // Add sample goals
+    const goalTypes = [
+      { type: 'weight_loss', title: 'Lose 5kg', target: 5, current: 2 },
+      { type: 'muscle_gain', title: 'Build Muscle', target: 100, current: 35 },
+      { type: 'cardio', title: 'Run 5K', target: 5000, current: 3200 },
+      { type: 'strength', title: 'Bench Press 100kg', target: 100, current: 75 }
+    ];
+
+    goalTypes.forEach(goal => {
+      const goalId = nanoid();
+      const newGoal: Goal = {
+        id: goalId,
+        userId,
+        type: goal.type,
+        title: goal.title,
+        description: `Target: ${goal.target}`,
+        targetValue: goal.target,
+        currentValue: goal.current,
+        targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
+        isCompleted: false,
+        createdAt: new Date(),
+      };
+      this.goals.set(goalId, newGoal);
+    });
+
+    // Add sample achievements
+    const achievements = [
+      { badge: 'first_workout', title: 'First Workout', icon: '🏃' },
+      { badge: 'week_streak', title: '7-Day Streak', icon: '🔥' },
+      { badge: 'calorie_burner', title: 'Calorie Crusher', icon: '💪' }
+    ];
+
+    achievements.forEach(achievement => {
+      const achievementId = nanoid();
+      const newAchievement: Achievement = {
+        id: achievementId,
+        userId,
+        badgeId: achievement.badge,
+        title: achievement.title,
+        description: `Earned for ${achievement.title.toLowerCase()}`,
+        icon: achievement.icon,
+        earnedAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+      };
+      this.achievements.set(achievementId, newAchievement);
+    });
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth } from "./auth";
 import { 
   insertDietPlanSchema,
   insertUserWorkoutSchema,
@@ -19,25 +19,21 @@ const openai = new OpenAI({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // Simple local auth setup
+  setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+  // Auth check middleware
+  const requireAuth = (req: any, res: any, next: any) => {
+    if (!req.requireAuth()) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
-  });
+    next();
+  };
 
   // Update user profile
-  app.patch('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/auth/user', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const profileData = updateUserProfileSchema.parse(req.body);
       const updatedUser = await storage.updateUserProfile(userId, profileData);
       res.json(updatedUser);
@@ -48,9 +44,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI Diet Plan Generation
-  app.post('/api/diet/generate', isAuthenticated, async (req: any, res) => {
+  app.post('/api/diet/generate', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { age, weight, fitnessGoal, allergies } = req.body;
 
       const prompt = `Create a personalized weekly meal plan for a ${age}-year-old person weighing ${weight}kg with a fitness goal of ${fitnessGoal}. ${allergies ? `They have the following allergies/restrictions: ${allergies}` : ''}
@@ -110,9 +106,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Get user's diet plans
-  app.get('/api/diet/plans', isAuthenticated, async (req: any, res) => {
+  app.get('/api/diet/plans', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const dietPlans = await storage.getUserDietPlans(userId);
       res.json(dietPlans);
     } catch (error) {
@@ -122,9 +118,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Get active diet plan
-  app.get('/api/diet/active', isAuthenticated, async (req: any, res) => {
+  app.get('/api/diet/active', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const activePlan = await storage.getActiveDietPlan(userId);
       res.json(activePlan);
     } catch (error) {
@@ -166,9 +162,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Log workout completion
-  app.post('/api/workouts/log', isAuthenticated, async (req: any, res) => {
+  app.post('/api/workouts/log', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const workoutData = insertUserWorkoutSchema.parse(req.body);
       
       const userWorkout = await storage.logWorkout({
@@ -207,9 +203,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Get user workout history
-  app.get('/api/workouts/history', isAuthenticated, async (req: any, res) => {
+  app.get('/api/workouts/history', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const workouts = await storage.getUserWorkouts(userId);
       res.json(workouts);
     } catch (error) {
@@ -219,9 +215,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Get user workout stats
-  app.get('/api/workouts/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/workouts/stats', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const stats = await storage.getUserWorkoutStats(userId);
       res.json(stats);
     } catch (error) {
@@ -231,9 +227,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Progress tracking
-  app.post('/api/progress', isAuthenticated, async (req: any, res) => {
+  app.post('/api/progress', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const progressData = insertUserProgressSchema.parse(req.body);
       
       const progress = await storage.logProgress({
@@ -248,9 +244,9 @@ Please provide a JSON response with the following structure:
     }
   });
 
-  app.get('/api/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/progress', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { days } = req.query;
       const progress = await storage.getUserProgress(userId, days ? parseInt(days as string) : 30);
       res.json(progress);
@@ -261,9 +257,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Goals management
-  app.post('/api/goals', isAuthenticated, async (req: any, res) => {
+  app.post('/api/goals', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const goalData = insertGoalSchema.parse(req.body);
       
       const goal = await storage.createGoal({
@@ -278,9 +274,9 @@ Please provide a JSON response with the following structure:
     }
   });
 
-  app.get('/api/goals', isAuthenticated, async (req: any, res) => {
+  app.get('/api/goals', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const goals = await storage.getUserGoals(userId);
       res.json(goals);
     } catch (error) {
@@ -289,7 +285,7 @@ Please provide a JSON response with the following structure:
     }
   });
 
-  app.patch('/api/goals/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/goals/:id', requireAuth, async (req, res) => {
     try {
       const updates = req.body;
       const goal = await storage.updateGoal(req.params.id, updates);
@@ -301,9 +297,9 @@ Please provide a JSON response with the following structure:
   });
 
   // Achievements
-  app.get('/api/achievements', isAuthenticated, async (req: any, res) => {
+  app.get('/api/achievements', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const achievements = await storage.getUserAchievements(userId);
       res.json(achievements);
     } catch (error) {
@@ -313,9 +309,9 @@ Please provide a JSON response with the following structure:
   });
 
   // AI Chatbot
-  app.post('/api/chat', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { message } = insertChatMessageSchema.parse(req.body);
 
       const response = await openai.chat.completions.create({
@@ -348,9 +344,9 @@ Please provide a JSON response with the following structure:
     }
   });
 
-  app.get('/api/chat/history', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/history', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { limit } = req.query;
       const history = await storage.getUserChatHistory(userId, limit ? parseInt(limit as string) : 50);
       res.json(history);
