@@ -30,6 +30,8 @@ import { nanoid } from "nanoid";
 export interface IStorage {
   // User operations (mandatory for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: any): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserProfile(userId: string, profile: Partial<User>): Promise<User>;
   
@@ -83,6 +85,37 @@ export class MemStorage implements IStorage {
   // User operations (mandatory for Replit Auth)
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.username === username);
+  }
+
+  async createUser(userData: any): Promise<User> {
+    const user: User = {
+      id: userData.id,
+      username: userData.username,
+      password: userData.password,
+      email: userData.email || null,
+      firstName: null,
+      lastName: null,
+      profileImageUrl: null,
+      age: null,
+      weight: null,
+      height: null,
+      fitnessGoal: null,
+      activityLevel: null,
+      allergies: null,
+      dietaryRestrictions: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set(userData.id, user);
+    
+    // Add sample data for new users
+    await this.addSampleDataForUser(userData.id);
+    
+    return user;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
