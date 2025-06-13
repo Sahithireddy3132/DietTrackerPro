@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/useAuth';
+import { useSimpleAuth } from '@/hooks/useSimpleAuth';
 
 export function HeroSection() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useSimpleAuth();
 
   const handleStartJourney = () => {
     if (isAuthenticated) {
@@ -10,7 +10,7 @@ export function HeroSection() {
       const workoutSection = document.getElementById('workouts');
       workoutSection?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.location.href = '/auth';
+      window.location.href = '/login';
     }
   };
 
