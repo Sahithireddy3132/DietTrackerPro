@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useAuth } from '@/hooks/useAuth';
+import { useSimpleAuth } from '@/hooks/useSimpleAuth';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 import { Moon, Sun, User, Menu, X } from 'lucide-react';
 
 export function Navigation() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useSimpleAuth();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
@@ -67,13 +67,7 @@ export function Navigation() {
             {/* User actions */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-2">
-                {user?.profileImageUrl && (
-                  <img 
-                    src={user.profileImageUrl} 
-                    alt="Profile" 
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                )}
+                <span className="text-sm text-electric">Hi, {user?.username}</span>
                 <Link href="/dashboard">
                   <Button className="bg-gradient-to-r from-electric to-neon-green hover:shadow-lg hover:shadow-electric/50 transition-all">
                     <User className="w-4 h-4 mr-2" />
@@ -82,7 +76,7 @@ export function Navigation() {
                 </Link>
                 <Button 
                   variant="outline"
-                  onClick={() => window.location.href = '/api/logout'}
+                  onClick={logout}
                   className="neon-border hover:bg-glass-bg"
                 >
                   Logout
@@ -90,7 +84,17 @@ export function Navigation() {
               </div>
             ) : (
               <Button 
-                onClick={() => window.location.href = '/api/login'}
+                onClick={() => {
+                  const username = prompt('Enter your name to start your fitness journey:');
+                  if (username && username.trim()) {
+                    localStorage.setItem('fitness_user', JSON.stringify({
+                      id: `user_${Date.now()}`,
+                      username: username.trim(),
+                      loginTime: new Date().toISOString()
+                    }));
+                    window.location.reload();
+                  }
+                }}
                 className="bg-gradient-to-r from-electric to-neon-green hover:shadow-lg hover:shadow-electric/50 transition-all"
               >
                 <User className="w-4 h-4 mr-2" />

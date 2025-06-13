@@ -1,185 +1,130 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Target, Droplets, Flame } from 'lucide-react';
+import { useSimpleAuth } from '@/hooks/useSimpleAuth';
+import { useSampleData } from '@/hooks/useSampleData';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export function ProgressSection() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useSimpleAuth();
+  const { progressData, workoutStats } = useSampleData();
 
-  const { data: workoutStats } = useQuery({
-    queryKey: ['/api/workouts/stats'],
-    enabled: isAuthenticated,
-  });
+  if (!isAuthenticated) {
+    return (
+      <section id="progress" className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold gradient-text mb-4">Track Your Progress</h2>
+            <p className="text-gray-400">Please log in to view your progress data.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  const { data: progress } = useQuery({
-    queryKey: ['/api/progress'],
-    enabled: isAuthenticated,
-  });
-
-  const { data: achievements } = useQuery({
-    queryKey: ['/api/achievements'],
-    enabled: isAuthenticated,
-  });
-
-  // Mock data for charts when user is not authenticated or no data
-  const chartData = progress?.slice(0, 7).reverse().map((p: any, index: number) => ({
-    day: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index],
-    workouts: 1,
-    calories: p.caloriesBurned || Math.floor(Math.random() * 400) + 200,
-  })) || [
-    { day: 'Mon', workouts: 1, calories: 320 },
-    { day: 'Tue', workouts: 2, calories: 450 },
-    { day: 'Wed', workouts: 1, calories: 280 },
-    { day: 'Thu', workouts: 3, calories: 580 },
-    { day: 'Fri', workouts: 2, calories: 420 },
-    { day: 'Sat', workouts: 1, calories: 300 },
-    { day: 'Sun', workouts: 2, calories: 480 },
-  ];
+  // Mood data from sample data
+  const moodCounts = progressData?.reduce((acc: any, day: any) => {
+    acc[day.mood] = (acc[day.mood] || 0) + 1;
+    return acc;
+  }, {}) || {};
 
   const moodData = [
-    { name: 'Energetic', value: 40, color: '#00FF88' },
-    { name: 'Happy', value: 30, color: '#00D4FF' },
-    { name: 'Motivated', value: 20, color: '#8B5CF6' },
-    { name: 'Tired', value: 10, color: '#6B7280' },
+    { name: 'Excellent', value: moodCounts.excellent || 0, color: '#10B981' },
+    { name: 'Good', value: moodCounts.good || 0, color: '#3B82F6' },
+    { name: 'Average', value: moodCounts.average || 0, color: '#F59E0B' },
+    { name: 'Tired', value: moodCounts.tired || 0, color: '#EF4444' }
   ];
 
-  const defaultAchievements = [
-    { icon: '🏃‍♀️', title: 'Cardio King', description: '5 cardio sessions' },
-    { icon: '💪', title: 'Strength Warrior', description: '10 strength workouts' },
-    { icon: '🔥', title: 'Calorie Crusher', description: '5000 calories burned' },
-    { icon: '🏆', title: 'Consistency Champion', description: '7 days streak', locked: true },
-    { icon: '🧘‍♀️', title: 'Zen Master', description: '20 meditation sessions', locked: true },
-    { icon: '⚡', title: 'Energy Boost', description: '30 HIIT workouts', locked: true },
+  const stats = [
+    { label: 'Total Workouts', value: workoutStats.totalWorkouts, color: 'text-electric' },
+    { label: 'Calories Burned', value: workoutStats.totalCalories.toLocaleString(), color: 'text-neon-green' },
+    { label: 'Hours Trained', value: Math.round(workoutStats.totalMinutes / 60), color: 'text-electric' },
+    { label: 'Avg Cal/Workout', value: workoutStats.avgCaloriesPerWorkout, color: 'text-neon-green' }
   ];
 
   return (
-    <section id="progress" className="py-20 bg-gradient-to-b from-dark-bg to-gray-900">
+    <section id="progress" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4">
-            Track Your <span className="gradient-text">Progress</span>
-          </h2>
-          <p className="text-xl text-gray-300">Monitor your fitness journey with real-time analytics</p>
+          <h2 className="text-5xl font-bold gradient-text mb-4">Track Your Progress</h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Monitor your fitness journey with detailed analytics and visual progress tracking
+          </p>
         </div>
-        
-        <div className="grid lg:grid-cols-3 gap-8 mb-12">
-          {/* Weekly Stats Cards */}
-          <Card className="glass-effect text-center">
-            <CardContent className="p-6">
-              <div className="relative w-24 h-24 mx-auto mb-4">
-                <svg className="progress-ring w-full h-full">
-                  <circle 
-                    className="progress-ring-circle stroke-electric" 
-                    strokeWidth="4" 
-                    fill="transparent" 
-                    r="45" 
-                    cx="48" 
-                    cy="48" 
-                    style={{ strokeDashoffset: 'calc(283 - (283 * 85) / 100)' }}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold">85%</span>
-                </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {stats.map((stat, index) => (
+            <div key={index} className="glass-effect rounded-xl p-6 text-center border border-electric/20 hover:border-electric/40 transition-all">
+              <div className={`text-3xl font-bold ${stat.color} mb-2`}>
+                {stat.value}
               </div>
-              <h3 className="text-xl font-semibold mb-2">Weekly Goal</h3>
-              <p className="text-gray-400">{workoutStats?.totalWorkouts || 4}/5 workouts completed</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="glass-effect text-center">
-            <CardContent className="p-6">
-              <div className="relative w-24 h-24 mx-auto mb-4">
-                <svg className="progress-ring w-full h-full">
-                  <circle 
-                    className="progress-ring-circle stroke-neon-green" 
-                    strokeWidth="4" 
-                    fill="transparent" 
-                    r="45" 
-                    cx="48" 
-                    cy="48" 
-                    style={{ strokeDashoffset: 'calc(283 - (283 * 92) / 100)' }}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold">92%</span>
-                </div>
+              <div className="text-gray-400 text-sm">
+                {stat.label}
               </div>
-              <h3 className="text-xl font-semibold mb-2">Calories</h3>
-              <p className="text-gray-400">{workoutStats?.totalCalories || 2024} / 2,200 kcal</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="glass-effect text-center">
-            <CardContent className="p-6">
-              <div className="relative w-24 h-24 mx-auto mb-4">
-                <svg className="progress-ring w-full h-full">
-                  <circle 
-                    className="progress-ring-circle stroke-purple-500" 
-                    strokeWidth="4" 
-                    fill="transparent" 
-                    r="45" 
-                    cx="48" 
-                    cy="48" 
-                    style={{ strokeDashoffset: 'calc(283 - (283 * 76) / 100)' }}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold">76%</span>
-                </div>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Hydration</h3>
-              <p className="text-gray-400">6.1 / 8.0 liters</p>
-            </CardContent>
-          </Card>
+            </div>
+          ))}
         </div>
-        
+
+        {/* Charts */}
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Workout Progress Chart */}
-          <Card className="glass-effect">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5 text-electric" />
-                <span>Workout Progress</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
+          {/* Weight & Calories Chart */}
+          <div className="glass-effect rounded-xl p-6 border border-electric/20">
+            <h3 className="text-xl font-semibold gradient-text mb-6">Weight & Calories Progress</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={progressData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="day" stroke="#9CA3AF" />
-                  <YAxis stroke="#9CA3AF" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#9CA3AF"
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  />
+                  <YAxis stroke="#9CA3AF" tick={{ fontSize: 12 }} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: '#1F2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '8px'
-                    }} 
+                      border: '1px solid #10B981',
+                      borderRadius: '8px',
+                      color: '#F3F4F6'
+                    }}
+                    formatter={(value, name) => [
+                      typeof value === 'number' ? value.toFixed(1) : value,
+                      name === 'weight' ? 'Weight (kg)' : 'Calories Burned'
+                    ]}
+                    labelFormatter={(value) => new Date(value).toLocaleDateString()}
                   />
-                  <Bar dataKey="calories" fill="var(--electric)" />
-                </BarChart>
+                  <Line 
+                    type="monotone" 
+                    dataKey="weight" 
+                    stroke="#10B981" 
+                    strokeWidth={3}
+                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="calories" 
+                    stroke="#3B82F6" 
+                    strokeWidth={3}
+                    dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
+                  />
+                </LineChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
-          
-          {/* Mood Tracker */}
-          <Card className="glass-effect">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Target className="h-5 w-5 text-neon-green" />
-                <span>Mood & Energy</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            </div>
+          </div>
+
+          {/* Mood Distribution */}
+          <div className="glass-effect rounded-xl p-6 border border-electric/20">
+            <h3 className="text-xl font-semibold gradient-text mb-6">Mood Distribution</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={moodData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
-                    outerRadius={100}
+                    outerRadius={120}
                     paddingAngle={5}
                     dataKey="value"
                   >
@@ -187,31 +132,56 @@ export function ProgressSection() {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1F2937', 
+                      border: '1px solid #10B981',
+                      borderRadius: '8px',
+                      color: '#F3F4F6'
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4 mt-4">
+              {moodData.map((mood, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: mood.color }}
+                  ></div>
+                  <span className="text-sm text-gray-300">{mood.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        
-        {/* Achievement Badges */}
+
+        {/* Recent Activity */}
         <div className="mt-12">
-          <h3 className="text-2xl font-semibold mb-8 text-center">Recent Achievements</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {(achievements && achievements.length > 0 ? achievements : defaultAchievements).map((achievement: any, index: number) => (
-              <Card 
-                key={achievement.id || index} 
-                className={`glass-effect text-center hover:scale-110 transition-transform cursor-pointer ${
-                  achievement.locked ? 'opacity-50' : ''
-                }`}
-              >
-                <CardContent className="p-4">
-                  <div className="text-3xl mb-2">{achievement.icon}</div>
-                  <div className="text-sm font-semibold">{achievement.title}</div>
-                  <div className="text-xs text-gray-400">{achievement.description}</div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="glass-effect rounded-xl p-6 border border-electric/20">
+            <h3 className="text-xl font-semibold gradient-text mb-6">Recent Activity</h3>
+            <div className="space-y-4">
+              {progressData.slice(-5).reverse().map((day, index) => (
+                <div key={index} className="flex justify-between items-center p-4 bg-dark-bg/50 rounded-lg border border-gray-700">
+                  <div>
+                    <div className="font-medium text-white">
+                      {new Date(day.date).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      Weight: {day.weight}kg • Mood: {day.mood}
+                    </div>
+                  </div>
+                  <div className="text-electric font-semibold">
+                    {day.calories} cal
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
