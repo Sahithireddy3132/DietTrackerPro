@@ -282,7 +282,7 @@ export class MemStorage implements IStorage {
       id,
       userId: messageData.userId,
       message: messageData.message,
-      response: messageData.response || null,
+      response: messageData.response ?? null,
       timestamp: new Date(),
     };
     this.chatMessages.set(id, message);

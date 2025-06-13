@@ -73,35 +73,72 @@ export function HeroSection() {
         </div>
         
         <div className="relative">
-          {/* Hero fitness image showcasing strength training */}
-          <img 
-            src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=800" 
-            alt="Fitness transformation journey" 
-            className="rounded-2xl shadow-2xl w-full h-auto animate-float" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-tr from-electric/20 to-neon-green/20 rounded-2xl"></div>
+          {/* Geometric fitness visualization */}
+          <div className="relative w-full max-w-md mx-auto h-96">
+            {/* Central fitness hub */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-r from-electric to-neon-green rounded-2xl flex items-center justify-center shadow-2xl animate-pulse">
+              <i className="fas fa-dumbbell text-2xl text-dark-bg"></i>
+            </div>
+            
+            {/* Orbiting fitness elements */}
+            <div className="absolute top-16 left-8 w-16 h-16 glass-effect rounded-xl flex items-center justify-center animate-float">
+              <i className="fas fa-heart text-red-400 text-xl"></i>
+            </div>
+            
+            <div className="absolute top-20 right-12 w-14 h-14 glass-effect rounded-full flex items-center justify-center animate-float" style={{animationDelay: '0.8s'}}>
+              <i className="fas fa-fire text-orange-400 text-lg"></i>
+            </div>
+            
+            <div className="absolute bottom-20 left-16 w-18 h-18 glass-effect rounded-2xl flex items-center justify-center animate-float" style={{animationDelay: '1.2s'}}>
+              <i className="fas fa-chart-line text-electric text-xl"></i>
+            </div>
+            
+            <div className="absolute bottom-16 right-8 w-16 h-16 glass-effect rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '1.6s'}}>
+              <i className="fas fa-trophy text-yellow-400 text-xl"></i>
+            </div>
+            
+            <div className="absolute top-1/3 right-4 w-12 h-12 glass-effect rounded-full flex items-center justify-center animate-float" style={{animationDelay: '2s'}}>
+              <i className="fas fa-apple-alt text-green-400"></i>
+            </div>
+            
+            <div className="absolute bottom-1/3 left-4 w-14 h-14 glass-effect rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '2.4s'}}>
+              <i className="fas fa-stopwatch text-blue-400 text-lg"></i>
+            </div>
+          </div>
           
-          {/* Floating UI Elements */}
-          <div className="absolute -top-6 -right-6 glass-effect rounded-2xl p-4 animate-float" style={{animationDelay: '0.5s'}}>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-electric to-neon-green rounded-full flex items-center justify-center">
-                <i className="fas fa-fire text-white"></i>
+          {/* Performance cards */}
+          <div className="absolute -top-4 -right-4 glass-effect rounded-xl p-3 animate-float" style={{animationDelay: '0.5s'}}>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-electric to-neon-green rounded-lg flex items-center justify-center">
+                <i className="fas fa-fire text-dark-bg text-sm"></i>
               </div>
               <div>
-                <div className="text-sm text-gray-400">Calories Burned</div>
-                <div className="font-bold text-white">850 kcal</div>
+                <div className="text-xs text-gray-400">Daily Goal</div>
+                <div className="font-bold text-white text-sm">850 kcal</div>
               </div>
             </div>
           </div>
           
-          <div className="absolute -bottom-6 -left-6 glass-effect rounded-2xl p-4 animate-float" style={{animationDelay: '1s'}}>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <i className="fas fa-trophy text-white"></i>
+          <div className="absolute -bottom-4 -left-4 glass-effect rounded-xl p-3 animate-float" style={{animationDelay: '1s'}}>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <i className="fas fa-trophy text-white text-sm"></i>
               </div>
               <div>
-                <div className="text-sm text-gray-400">Achievement</div>
-                <div className="font-bold text-white">Cardio King 👑</div>
+                <div className="text-xs text-gray-400">Streak</div>
+                <div className="font-bold text-white text-sm">7 Days</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="absolute top-1/4 -left-6 glass-effect rounded-xl p-3 animate-float" style={{animationDelay: '1.5s'}}>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <i className="fas fa-chart-line text-white text-sm"></i>
+              </div>
+              <div>
+                <div className="text-xs text-gray-400">Progress</div>
+                <div className="font-bold text-white text-sm">+12%</div>
               </div>
             </div>
           </div>
