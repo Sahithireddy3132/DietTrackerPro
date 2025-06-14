@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FitZone Pro - AI-Powered Fitness Platform
 
 Transform your fitness journey with AI-powered personalization, smart coaching, and real-time progress tracking.
@@ -117,3 +118,6 @@ Transform your fitness journey with AI-powered personalization, smart coaching, 
    ```bash
    npm run dev
    
+=======
+# DietTrackerPro
+>>>>>>> 6259f52a3a6fb515329f6eaa1202132f1c20ae4c
